@@ -1,0 +1,33 @@
+name: Post Webhook
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  push:
+
+jobs:
+  post_webhook:
+    runs-on: ubuntu-latest
+    name: Post Webhook
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup a Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - name: Install packages
+        run: pip install -r requirements.txt
+      - name: Webhook
+        id: rss
+        uses: ./
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          STREAMER_USERNAME: ${{ secrets.STREAMER_USERNAME }}
+        run: python src/main.py
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "Updated sent.txt"
+          git push
