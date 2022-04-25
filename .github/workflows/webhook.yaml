@@ -20,7 +20,6 @@ jobs:
         run: pip install -r requirements.txt
       - name: Webhook
         id: rss
-        uses: ./
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
           STREAMER_USERNAME: ${{ secrets.STREAMER_USERNAME }}
