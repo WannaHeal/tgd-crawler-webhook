@@ -8,6 +8,7 @@ import requests
 
 WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
 STREAMER_USERNAME = os.environ.get("STREAMER_USERNAME")
+IGNORED_CATEGORIES = os.environ.get("IGNORED_CATEGORIES", "")
 
 
 @dataclass
@@ -72,6 +73,17 @@ def filter_sent_posts(l: List[TgdPost]) -> List[TgdPost]:
             f.write(str(post.post_id) + "\n")
     return ret
 
+def filter_posts_with_ignored_categories(l: List[TgdPost]) -> List[TgdPost]:
+    ret = []
+    ignored_categories = IGNORED_CATEGORIES.split(",")
+
+    for post in l:
+        if post.category in ignored_categories:
+            continue
+        ret.append(post)
+    return ret
+
+
 def upload_new_posts(l: List[TgdPost]):
     payload = {}
     payload["content"] = "트게더에 새로운 글이 올라왔어요!"
@@ -95,4 +107,5 @@ if __name__ == "__main__":
     body = get_posts_from_tdg(STREAMER_USERNAME)
     posts = parse_posts(body)
     posts = filter_sent_posts(posts)
+    posts = filter_posts_with_ignored_categories(posts)
     upload_new_posts(posts)
