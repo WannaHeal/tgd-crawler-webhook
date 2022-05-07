@@ -39,6 +39,10 @@ def parse_posts(html_body: str) -> List[TgdPost]:
     posts = soup.select("div.article-list-row")
 
     for post in posts:
+        # Exclude featured posts
+        if "featured" in post.attrs["class"]:
+            continue
+
         # print(type(post))
         # print(post)
         # print("글 번호:", post.get("id", "").split("-")[-1])
