@@ -19,10 +19,16 @@ class TgdPost:
     url: str
 
 
+def test_webhook_url(webhook_url: str):
+    r = requests.get(webhook_url)
+    if not r.ok:
+        raise ValueError("Environment variable WEBHOOK_URL not proper")
+
+
 def get_posts_from_tdg(streamer_username: str) -> str:
     r = requests.get(f"https://tgd.kr/{streamer_username}")
     if not r.ok:
-        raise AttributeError("page not ok")
+        raise ValueError("page not ok")
     return r.text
 
 
@@ -97,13 +103,23 @@ def upload_new_posts(l: List[TgdPost]):
         payload["embeds"].append(embed)
         if i % 10 == 9:
             res = requests.post(WEBHOOK_URL, json=payload)
+            if not res.ok:
+                raise RuntimeError(f"Something is wrong: {res.text}")
             payload["embeds"].clear()
     
     if len(payload["embeds"]) != 0:
         res = requests.post(WEBHOOK_URL, json=payload)
+        if not res.ok:
+            raise RuntimeError(f"Something is wrong: {res.text}")
 
 
 if __name__ == "__main__":
+    if WEBHOOK_URL is None:
+        raise ValueError("Environment variable WEBHOOK_URL not set")
+    if STREAMER_USERNAME is None:
+        raise ValueError("Environment variable STREAMER_NAME not set")
+
+
     body = get_posts_from_tdg(STREAMER_USERNAME)
     posts = parse_posts(body)
     posts = filter_sent_posts(posts)
