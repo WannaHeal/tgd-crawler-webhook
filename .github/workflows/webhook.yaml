@@ -23,6 +23,7 @@ jobs:
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
           STREAMER_USERNAME: ${{ secrets.STREAMER_USERNAME }}
+          IGNORED_CATEGORIES: ${{ secrets.IGNORED_CATEGORIES }}
         run: python src/main.py
       - name: Check if there is any new translations
         id: verify_diff
