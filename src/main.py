@@ -2,6 +2,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 import requests
@@ -26,7 +27,7 @@ def test_webhook_url(webhook_url: str):
 
 
 def get_posts_from_tdg(streamer_username: str) -> str:
-    r = requests.get(f"https://tgd.kr/{streamer_username}")
+    r = requests.get(urljoin("https://tgd.kr", streamer_username))
     if not r.ok:
         raise ValueError("page not ok")
     return r.text
@@ -59,7 +60,7 @@ def parse_posts(html_body: str) -> List[TgdPost]:
             post_id=int(post.get("id", "").split("-")[-1]),
             category=cat,
             title=a.attrs["title"],
-            url="https://tgd.kr" + a.attrs["href"],
+            url=urljoin("https://tgd.kr", a.attrs["href"]),
         ))
 
     # print(ret)
